@@ -10,7 +10,7 @@ World::World()
         {
             // Create Pixels
             Vector2 position = {x * pixelSize, y * pixelSize};
-            worldPixels.push_back(std::make_shared<Pixel>(position, pixelSize));
+            worldPixels.push_back(std::make_shared<Pixel>(position, pixelSize, &BehaviourManager::airData));
         }
     }
 }
@@ -34,6 +34,8 @@ std::shared_ptr<Pixel> World::getPixelUnderMouse()
             }
         }
     }
+
+    return nullptr;
 }
 
 void World::spawnOnMouse()
@@ -42,7 +44,10 @@ void World::spawnOnMouse()
     {
         std::shared_ptr<Pixel> pixel = getPixelUnderMouse();
 
-        pixel->setType(selectedType);
+        if (pixel != nullptr)
+        {
+            pixel->setData(&BehaviourManager::sandData);
+        }
     }
 }
 

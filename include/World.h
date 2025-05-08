@@ -1,6 +1,4 @@
 #pragma once
-#include "raylib.h"
-#include "stdio.h"
 
 #include "../include/Pixel.h"
 
