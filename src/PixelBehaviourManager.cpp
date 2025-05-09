@@ -7,9 +7,10 @@ PixelData BehaviourManager::waterData(PixelType::WATER, BLUE, WATER_DENSITY, wat
 
 void BehaviourManager::moveFrom(std::shared_ptr<Pixel> t_current, PixelData& t_currentData, std::shared_ptr<Pixel> t_newPlace)
 {
+    t_current->setData(&t_newPlace->getData());
+    t_current->updated = true;
     t_newPlace->setData(&t_currentData); // Set the pixel under to be the new type
     t_newPlace->updated = true;
-    t_current->setData(&airData);
 }
 
 void BehaviourManager::airBehaviour(const std::vector<std::shared_ptr<Pixel>>& t_worldPixels, int t_index, int t_width, int t_height, Vector2 t_position, float t_size)

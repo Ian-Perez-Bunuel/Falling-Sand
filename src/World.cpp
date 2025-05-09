@@ -1,18 +1,46 @@
 #include "../include/World.h"
 
-World::World()
+void World::init()
 {
+    calcWorldDimensions();
     worldPixels.reserve((worldWidth * worldHeight) * sizeof(Pixel)); // Reserve enough space to fill the world
 
+    // Fill in the Area with air
     for (int y = 0; y < worldHeight; y++)
     {
         for (int x = 0; x < worldWidth; x++)
         {
             // Create Pixels
-            Vector2 position = {x * pixelSize, y * pixelSize};
-            worldPixels.push_back(std::make_shared<Pixel>(position, pixelSize, &BehaviourManager::airData));
+            Vector2 position = {x * PIXEL_SIZE, y * PIXEL_SIZE};
+            worldPixels.push_back(std::make_shared<Pixel>(position, PIXEL_SIZE, &BehaviourManager::airData));
         }
     }
+    
+    // Give each area their Pixels from the world
+    areaWidth = worldWidth / AREA_SPLIT;
+    areaHeight = worldHeight / AREA_SPLIT;
+    int currentArea = 0;
+    // Populate each area
+    for (int rows = 0; rows < AREA_SPLIT; rows++)
+    {
+        for (int colms = 0; colms < AREA_SPLIT; colms++)
+        {
+            for (int x = 0; x < areaWidth; x++)
+            {
+                for (int y = 0; y < areaHeight; y++)
+                {
+                    areas[currentArea].push_back(getPixelFromXY(x + (rows * areaWidth), y + (colms * areaHeight)));
+                }
+            }
+            currentArea++;
+        }
+    }
+}
+
+void World::calcWorldDimensions()
+{
+    worldWidth = GetScreenWidth() / PIXEL_SIZE;
+    worldHeight = GetScreenHeight() / PIXEL_SIZE;
 }
 
 std::shared_ptr<Pixel> World::getPixelUnderMouse()
@@ -27,8 +55,8 @@ std::shared_ptr<Pixel> World::getPixelUnderMouse()
             float pixelX = worldPixels[i]->getPos().x;
             float pixelY = worldPixels[i]->getPos().y;
 
-            if (mouseX >= pixelX - (pixelSize / 2.0f) && mouseX <= pixelX + (pixelSize / 2.0f) &&
-                mouseY >= pixelY - (pixelSize / 2.0f) && mouseY <= pixelY + (pixelSize / 2.0f))
+            if (mouseX >= pixelX - (PIXEL_SIZE / 2.0f) && mouseX <= pixelX + (PIXEL_SIZE / 2.0f) &&
+                mouseY >= pixelY - (PIXEL_SIZE / 2.0f) && mouseY <= pixelY + (PIXEL_SIZE / 2.0f))
             {
                 return worldPixels[i];
             }
@@ -55,6 +83,21 @@ void World::spawnOnMouse()
     }
 }
 
+void World::updateArea(int t_areaNumber)
+{
+    for (int i = 0; i < areas[t_areaNumber].size(); i++)
+    {
+        if (!areas[t_areaNumber][i]->updated)
+        {
+            areas[t_areaNumber][i]->update(worldPixels, i, worldWidth, worldHeight);
+        }
+        else
+        {
+            areas[t_areaNumber][i]->updated = false;
+        }
+    }
+}
+
 void World::update()
 {
     // Commands
@@ -63,16 +106,9 @@ void World::update()
         debugMode = !debugMode;
     }
 
-    for (int i = 0; i < worldPixels.size(); i++)
+    for (int i = 0; i < AREA_AMOUNT; i++)
     {
-        if (!worldPixels[i]->updated)
-        {
-            worldPixels[i]->update(worldPixels, i, worldWidth, worldHeight);
-        }
-        else
-        {
-            worldPixels[i]->updated = false;
-        }
+        updateArea(i);
     } 
 
     spawnOnMouse();
@@ -101,4 +137,16 @@ void World::drawGrid()
             DrawLine(x, y, x, y + GetScreenHeight(), WHITE);
         }
     }
+}
+
+std::shared_ptr<Pixel> World::getPixelFromXY(int t_x, int t_y)
+{
+    // Bounds check
+    if (t_x < 0 || t_x >= worldWidth || t_y < 0 || t_y >= worldHeight)
+    {
+        return nullptr;
+    }
+
+    int index = t_y * worldWidth + t_x;
+    return worldPixels[index];
 }

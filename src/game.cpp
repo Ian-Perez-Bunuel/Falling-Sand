@@ -4,7 +4,7 @@
 
 void Game::init()
 {
-    
+    world.init();
 }
 
 void Game::draw()
