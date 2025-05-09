@@ -11,9 +11,7 @@ public:
     virtual void draw();
 
     void setData(PixelData* t_data) { data = t_data; }
-
-    PixelType getType() { return data->type; }
-    void setType(PixelType t_type) { data->type = t_type; }
+    PixelData& getData() { return *data;}
 
     Vector2 getPos() { return position; }
 

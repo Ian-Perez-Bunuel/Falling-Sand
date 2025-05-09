@@ -40,19 +40,29 @@ std::shared_ptr<Pixel> World::getPixelUnderMouse()
 
 void World::spawnOnMouse()
 {
-    if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
-    {
-        std::shared_ptr<Pixel> pixel = getPixelUnderMouse();
+    std::shared_ptr<Pixel> pixel = getPixelUnderMouse();
 
-        if (pixel != nullptr)
+    if (pixel != nullptr)
+    {  
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
         {
-            pixel->setData(&BehaviourManager::sandData);
+            pixel->setData(&BehaviourManager::sandData); 
+        }
+        else if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+        {
+            pixel->setData(&BehaviourManager::waterData);  
         }
     }
 }
 
 void World::update()
 {
+    // Commands
+    if (IsKeyPressed(KEY_F1))
+    {
+        debugMode = !debugMode;
+    }
+
     for (int i = 0; i < worldPixels.size(); i++)
     {
         if (!worldPixels[i]->updated)

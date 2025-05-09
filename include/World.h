@@ -20,11 +20,10 @@ private:
     // Spawning
     std::shared_ptr<Pixel> getPixelUnderMouse();
     void spawnOnMouse();
-    PixelType selectedType = PixelType::SAND;
-
 
     // Grid
     void drawGrid();
 
+    // Debugging
     bool debugMode = false;
 };

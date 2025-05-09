@@ -14,8 +14,5 @@ void Pixel::update(const std::vector<std::shared_ptr<Pixel>>& t_worldPixels, int
 
 void Pixel::draw()
 {
-    if (data->type == PixelType::SAND)
-    {
-        DrawRectangle(position.x, position.y, size, size, data->color);
-    }
+    DrawRectangle(position.x, position.y, size, size, data->color);
 }
